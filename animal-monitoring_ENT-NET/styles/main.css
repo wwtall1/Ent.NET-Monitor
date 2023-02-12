@@ -1,0 +1,127 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+/*h1,h2,h3{color: #00326B; }official WITC blue, Gold - #F59C25*/
+
+body { 	
+    font-family: Verdana, Arial, sans-serif;
+    margin: 0 auto;
+    min-width: 92%;	/*940px /  1024*/
+    max-width: 1024px;
+    border: 1px solid black;    
+}
+/*the header is in the inclue/header.jsp file*/
+header{
+    background-color: #0053b3;/*NEW lighter than official WITC blue #151515; black*/
+    margin-bottom: 1.5em;
+}
+header h1{
+    color: white;
+    padding: .5em;
+}
+header nav{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    background-color: inherit;
+}
+header nav a{
+    display: block;
+    width: 10em;
+    text-decoration: none;
+    color: white;
+    background-color: inherit;
+    padding: .25em 1.5em;
+    
+}
+
+header nav a:hover{
+    filter: brightness(110%); 
+}
+
+main{
+    padding-bottom: 2em;
+}
+main#result{
+    margin-left: 2em;
+}
+form{
+    flex-basis: 90%;
+    padding-left: 4.5%;
+    padding-top: 3%;
+}
+
+fieldset{
+    flex-basis: 80%;
+    order: 1;
+    padding-left: 4.5%;
+}
+
+fieldset legend{
+  background-color: gray;
+  color: white;
+  padding: 5px 10px; 
+  margin-bottom: .75em;
+}
+
+fieldset div{
+    padding-left: .5em;
+    display: inline;
+}
+
+footer{
+    clear: both;
+    background-color: steelblue;
+    padding: .9375em 3.3333%; /* 15 / 16; 30 / 900 * 100 */
+}
+footer p{
+    text-align: center;
+    font-size: 85%;
+    color: white;
+}
+label {
+    display: inline-block;
+    width: 100px;
+    align-self:flex-start;
+    margin-left: 2em;
+}
+input[type="submit"]{
+	margin-left: 1em;
+	min-width: 8em;
+        text-align: center;
+        margin-right: 1em;
+}
+table {
+    border: 3px solid black;
+    border-collapse: collapse;
+}
+td, th {
+    border: 3px solid black;
+    padding: .1em .3em .1em .3em;
+    vertical-align: top;
+    text-align: left;
+}
+
+
+@media only screen and (max-width: 479px) {
+    header h1{
+        text-align: center;
+    }
+    fieldset div{
+        padding-left: 1.5em;
+        width: 100%;
+        display: block;
+    }
+    
+    input[type="submit"]{
+	margin-left: 1.75em;
+        margin-top: 1em;
+	width: 80%;
+    }
+    input[type="text"]{
+        margin-top: .5em;
+	width: 80%;
+    }
+}
+
