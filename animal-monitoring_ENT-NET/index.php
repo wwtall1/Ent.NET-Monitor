@@ -1,4 +1,9 @@
-    <?php require_once('bases/database.php');
+    <?php 
+    require_once('bases/session.php');
+    require('bases/Monitor.php');
+    require_once('bases/monitor_db.php');
+    require_once('bases/database.php');
+    check_or_start_session();
     require('bases/User.php');
     $title = "Home Index"; 
     require_once "view/header.php";  ?>

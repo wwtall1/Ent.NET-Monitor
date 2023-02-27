@@ -8,10 +8,10 @@ class User_db {
         $statement = $db->prepare($query);
         $statement->bindValue(':ID', $ID);
         $statement->execute();
-        $user = $statement->fetchAll();
+        $baseUser = $statement->fetchAll();
         $statement->closeCursor();
-        foreach ($user as $userData){
-            $wlUser = new User(
+        foreach ($baseUser as $userData){
+            $user = new User(
                 $userData['id'],   
                 $userData['userTypeID'],    
                 $userData['firstName'],
@@ -26,7 +26,7 @@ class User_db {
                 $userData['isActive']
                     );
         }
-        return $wlUser;
+        return $user;
     }
     static function get_user_by_email_password($email,$password){
         $db = database::getDB();

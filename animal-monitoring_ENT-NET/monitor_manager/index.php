@@ -1,4 +1,8 @@
 <?php
+require_once('../bases/session.php');
+require('../bases/Monitor.php');
+require_once('../bases/monitor_db.php');
+check_or_start_session();
 require_once('../bases/database.php');
 require('../bases/User.php');
 require_once('../bases/user_db.php');
@@ -17,14 +21,26 @@ if ( $controllerChoice == NULL) {
 
 if($controllerChoice == 'list_monitors'){
     $title = "Monitor List Page";
-    $monitorSet = filter_input(INPUT_POST, 'setMonitor');
+    $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
+    $setMonitor = $monitors;
+
+    
     require_once("monitor_list.php");
 
     
     
 }
-else if($controllerChoice =='set_monitor'){
-    require_once("monitor.php");
+else if($controllerChoice =='swap_monitor'){
+    $title = "Monitor List Page";
+    $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
+    $setMonitor = $monitors;
+    $ifMonitor = filter_input(INPUT_POST, 'setMonitor');
+    foreach($monitors as $checkMonitor){
+        if($checkMonitor->getId() == $ifMonitor){
+            $setMonitor = $checkMonitor;
+        }
+    }
+    require_once("monitor_list.php");
 }
 
 
