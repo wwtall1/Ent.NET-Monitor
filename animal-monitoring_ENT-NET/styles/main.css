@@ -102,6 +102,13 @@ td, th {
     vertical-align: top;
     text-align: left;
 }
+fieldset{
+    margin: 2em;
+    float: left;
+    width: 30%;
+    display: inline-block;
+    box-sizing: border-box;
+}
 
 
 @media only screen and (max-width: 479px) {
@@ -111,7 +118,8 @@ td, th {
     fieldset div{
         padding-left: 1.5em;
         width: 100%;
-        display: block;
+        display: flex;
+        box-sizing: initial;
     }
     
     input[type="submit"]{

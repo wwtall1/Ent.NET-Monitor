@@ -1,32 +1,27 @@
 <?php
+require_once('../bases/session.php');
+require('../bases/Monitor.php');
+require_once('../bases/monitor_db.php');
+check_or_start_session();
 require_once('../bases/database.php');
 require('../bases/User.php');
 require_once('../bases/user_db.php');
 require_once "../view/header.php";
 
-// Get the data from either the GET or POST collection.
+
 $controllerChoice = filter_input(INPUT_POST, 'controllerRequest');
 if ( $controllerChoice == NULL) {
      $controllerChoice = filter_input(INPUT_GET, 'controllerRequest');
     if ( $controllerChoice == NULL) {
          $controllerChoice = 'Not Set (Null)';
-         // After you have debugged, you can then default the controller choice.
-         //$controllerChoice = 'login_customer';
     }
 }  
-
-
-/*  The controller does three things
-*  1: Makes a decision based on the value of $controllerChoise
-*  2:  Gathers the required resources / objects needed to display on the view
-*  3:  Includes the appropriet view or redirect to a different page.
-*/
 
 
 if($controllerChoice == 'login_user'){
     $errorMessage = "";
     $email = filter_input(INPUT_COOKIE, 'emailCookie');
-    $password = filter_input(INPUT_COOKIE, 'passwordCookie'); //bad practice but requested ;-;
+    $password = filter_input(INPUT_COOKIE, 'passwordCookie');
     $validLogin = filter_input(INPUT_GET, 'validLogin');
     if($validLogin == null){
         $validLogin=true;
@@ -62,6 +57,7 @@ else if($controllerChoice == 'validate_login'){
 
          if($user != null){
              $isGood = true;
+             user_login($user->getId(), $user->getFirstName(), $user->getLastName(), $user->getUserTypeID());
              $statement->closeCursor();
          }else{
              $statement->closeCursor();
@@ -107,6 +103,7 @@ else if ($controllerChoice == 'validate_add_user'){
     // Add the product to the database  
         $user = new User(0, 1, $firstName, $lastName, $phone, $email, $address, $city, $state, $zip,$password, 1,);
     User_db::add_user($user);
+    user_login($user->getId(), $user->getFirstName(), $user->getLastName(), $user->getUserTypeID());
     require_once("register_process.php");
     }else{
     $errorMessage = "User already exists!";
