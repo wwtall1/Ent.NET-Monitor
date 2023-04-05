@@ -111,6 +111,14 @@ else if ($controllerChoice == 'validate_add_user'){
     require_once("register.php");
     }   
 }
+else if($controllerChoice == 'logout_user'){
+    end_session();
+    
+    header("Location: ../index.php");
+    
+}
+
+
 // Final else very helpful for debugging.
 else {
       // Show this is an unhandled $controllerChoice

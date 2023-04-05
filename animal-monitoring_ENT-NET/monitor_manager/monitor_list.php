@@ -10,5 +10,5 @@
     </select>
     <input type="submit" value="Set Monitor">
     </form><br>
-    <div><?php if(!is_null($monitors)){require("monitor.php");} //get the chosen monitor from the setMonitor select; display via monitor.php ?></div>
+    <div><?php if(!is_null($monitors) && $showMonitors){require("monitor.php");} //get the chosen monitor from the setMonitor select; display via monitor.php ?></div>
 </body>

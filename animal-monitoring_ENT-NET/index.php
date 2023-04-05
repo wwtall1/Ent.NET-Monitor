@@ -14,11 +14,17 @@
     
     <body>
         <h1><i>Welcome to Lionel Klein's Animal Monitor!</i></h1><br>
+        <?php if(!isset($_SESSION['user_ID'])): ?>
         <a href="user_manager?controllerRequest=login_user"> Login </a><br>
         <a href="user_manager?controllerRequest=add_user"> Register </a><br>
-        <a href="monitor_manager?controllerRequest=list_monitors"> Monitors </a><br>
+        <?php endif;?>
         
+        <?php if(isset($_SESSION['user_ID'])): ?>
+        <a href="monitor_manager?controllerRequest=list_monitors"> Monitors </a><br>
+        <a href="monitor_manager?controllerRequest=new_monitor"> Add Monitor </a><br>
+        <a href="monitor_manager?controllerRequest=weather_monitor"> Weather Monitor </a><br>
+        <?php endif;?>
         <br><br>
-
+        
     </body>
     <?php require_once 'view/footer.php'; ?>

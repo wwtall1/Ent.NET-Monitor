@@ -2,7 +2,7 @@
 function check_or_start_session(){
     if (session_id() == '') { 
           $lifetime = 60 * 60 * 24 * 3; 
-          // 2 weeks in seconds 
+          // 3 days
            session_set_cookie_params($lifetime, '/'); 
            session_start();
     } 

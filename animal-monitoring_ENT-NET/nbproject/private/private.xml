@@ -3,9 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/index.php</file>
+            <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/bases/Monitor.php</file>
             <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/bases/monitor_db.php</file>
             <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/monitor_manager/monitor_list.php</file>
+            <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/bases/AnimalType.php</file>
             <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/monitor_manager/monitor.php</file>
+            <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/monitor_manager/weather_monitor.php</file>
+            <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/bases/WeatherType.php</file>
             <file>file:/C:/xampp/htdocs/animal-monitoring_ENT-NET/monitor_manager/index.php</file>
         </group>
     </open-files>

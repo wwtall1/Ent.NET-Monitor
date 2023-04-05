@@ -11,7 +11,7 @@
         <a href="index.php"> Home </a>
         <a href="user_manager?controllerRequest=login_user"> Login </a><br>
         <a href="user_manager?controllerRequest=add_user"> Register </a><br>
-
+        <a href="user_manager?controllerRequest=logout_user"> Log Out </a><br>
     </nav>
 </header>
     
