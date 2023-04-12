@@ -23,6 +23,7 @@ if ( $controllerChoice == NULL) {
 
 if($controllerChoice == 'list_monitors'){
     $title = "Monitor List Page";
+    monitor_db::archive_monitors();
     $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
     $showMonitors = false;
 
@@ -34,6 +35,7 @@ if($controllerChoice == 'list_monitors'){
 }
 else if($controllerChoice =='swap_monitor'){
     $title = "Monitor List Page";
+    monitor_db::archive_monitors();
     $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
     $setMonitor = $monitors[1];
     $ifMonitor = filter_input(INPUT_POST, 'setMonitor');
@@ -85,16 +87,12 @@ else if($controllerChoice == 'add_monitor'){
     } else {
         $date_time_formatted = $date_time->format('Y-m-d H:i');
         $monitor = new Monitor(1, $userID, $animalCount, $foodWeightFull, $foodWeightEmpty, $foodAlert, $waterWeightFull, $waterWeightEmpty, $waterAlert, $date_time_formatted, 24, $animalType, $location, $notes, $feedType, 50, 50, $date_time_formatted);
-
         monitor_db::add_monitor($monitor);
-        
         header('Location: ../index.php');
     }
-    
-    
 }
 else if($controllerChoice == 'weather_monitor'){
-
+    monitor_db::archive_weather();
     $relayHistory = monitor_db::get_weather($_SESSION['user_ID']);
     $setTemperatureType = filter_input(INPUT_POST, 'temperatureSelect');
     if($setTemperatureType == null || $setTemperatureType == ""){
@@ -117,8 +115,25 @@ else if($controllerChoice == 'weather_monitor'){
     }
     require_once('weather_monitor.php');
     
+}
+else if($controllerChoice == 'new_animal'){
+    $title = "Add an Animal Type!";
     
+    require_once ('./add_animal.php');
     
+}
+else if($controllerChoice == 'add_animal'){
+    $description = filter_input(INPUT_POST, 'type');
+    $foodRecommend = filter_input(INPUT_POST, 'food');
+    if($description != null && $foodRecommend != null && $description != ""){
+        $animalType = new AnimalType(0, $description, $foodRecommend);
+        monitor_db::add_animalType($animalType);
+        header('Location: ../index.php');
+    }
+    else{
+        $title = "Add a Valid Animal Type!!";
+        require_once ('./add_animal.php');
+    }
     
 }
 

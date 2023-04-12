@@ -112,7 +112,7 @@ class monitor_db {
         $statement->execute();
         $statement->closeCursor();
     }
-static function get_animal_types(){
+    static function get_animal_types(){
         $db = database::getDB();
         
                 $query = "SELECT * FROM animalType";
@@ -130,7 +130,7 @@ static function get_animal_types(){
                 }
             return $animalTypes;
         }
-static function get_weather($userID){
+    static function get_weather($userID){
     $db = database::getDB();
     
     $user = User_db::get_user_by_id($userID);
@@ -149,6 +149,38 @@ static function get_weather($userID){
     }
     return $weatherRelay;
             
+}
+    static function archive_weather(){
+    $db = database::getDB();
+    
+    $query = "INSERT INTO weatherHistory(relayID, degrees, expectedAlert, timeDateChecked) SELECT id, degrees, expectedAlert, NOW() FROM weatherRelay;";
+    $statement = $db->prepare($query);
+    $statement->execute();
+    $statement->closeCursor();
+}
+static function archive_monitors(){
+    $db = database::getDB();
+    
+    $query = "INSERT INTO monitorHistory(monitorID, foodLevel, waterLevel, dateTimeChecked) SELECT id, foodLevelAlert, waterLevelAlert, NOW() FROM monitor;";
+    $statement = $db->prepare($query);
+    $statement->execute();
+    $statement->closeCursor();
+}
+static function add_animalType($animalType){
+    $db = database::getDB();
+    
+    $query = 'INSERT INTO animalType
+                     (description, recommendedFood)
+                  VALUES
+                     (:description, :recommendedFood)';
+        $statement = $db->prepare($query);
+
+        $statement->bindValue(':description', $animalType->getDescription());
+        $statement->bindValue(':recommendedFood', $animalType->getRecommendedFood());
+
+        $statement->execute();
+        $statement->closeCursor();
+    
 }
     
 }?>

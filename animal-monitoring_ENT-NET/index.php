@@ -23,6 +23,9 @@
         <a href="monitor_manager?controllerRequest=list_monitors"> Monitors </a><br>
         <a href="monitor_manager?controllerRequest=new_monitor"> Add Monitor </a><br>
         <a href="monitor_manager?controllerRequest=weather_monitor"> Weather Monitor </a><br>
+            <?php if(isset($_SESSION['userType'])): ?>
+            <br><br><a href="monitor_manager?controllerRequest=new_animal"> Add Animal Type </a><br>
+            <?php endif;?>
         <?php endif;?>
         <br><br>
         
