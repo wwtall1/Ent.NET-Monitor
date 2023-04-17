@@ -18,26 +18,19 @@ if ( $controllerChoice == NULL) {
          $controllerChoice = 'Not Set (Null)';
     }
 }  
-
-
-
 if($controllerChoice == 'list_monitors'){
     $title = "Monitor List Page";
     monitor_db::archive_monitors();
     $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
     $showMonitors = false;
 
-    
     require_once("monitor_list.php");
-
-    
-    
 }
 else if($controllerChoice =='swap_monitor'){
     $title = "Monitor List Page";
     monitor_db::archive_monitors();
     $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
-    $setMonitor = $monitors[1];
+    $setMonitor = $monitors[0];
     $ifMonitor = filter_input(INPUT_POST, 'setMonitor');
     $showMonitors = true;
     foreach($monitors as $checkMonitor){
@@ -74,6 +67,7 @@ else if($controllerChoice == 'add_monitor'){
     $notes  = filter_input(INPUT_POST, 'notes');
     $feedType  = filter_input(INPUT_POST, 'feedType');
 
+    
     $date_str = date('Y-m-d'); 
     $date_time_str = trim($date_str . ' ' . $feedingTime . ''); 
     $date_time = DateTime::createFromFormat('Y-m-d H:i', $date_time_str); 
@@ -91,7 +85,19 @@ else if($controllerChoice == 'add_monitor'){
         header('Location: ../index.php');
     }
 }
-else if($controllerChoice == 'weather_monitor'){
+else if($controllerChoice == 'remove_monitor'){
+    
+    $removeMonitorID = filter_input(INPUT_POST, 'monitorID');
+    monitor_db::remove_monitor($removeMonitorID);
+    
+    $title = "Monitor List Page";
+    monitor_db::archive_monitors();
+    $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
+    $showMonitors = false;
+
+    require_once("monitor_list.php");
+}
+else if($controllerChoice == 'weather_monitor' || $controllerChoice == 'change_weather'){
     monitor_db::archive_weather();
     $relayHistory = monitor_db::get_weather($_SESSION['user_ID']);
     $setTemperatureType = filter_input(INPUT_POST, 'temperatureSelect');
@@ -104,14 +110,13 @@ else if($controllerChoice == 'weather_monitor'){
     switch($setTemperatureType){
         default:
         case '1':
-            $relayTempConverted = $relayHistory->getDegrees();
+            $relayTempConverted = round($relayHistory->getDegrees(), 2);
             break;
         case'2':
-            $relayTempConverted = ((doubleval($relayHistory->getDegrees()) - 32 ) * (5/9));
+            $relayTempConverted = round(((doubleval($relayHistory->getDegrees()) - 32 ) * (5/9)), 2);
         case'3':
-            $relayTempConverted = doubleval($relayTempConverted) + 273.15;
+            $relayTempConverted = round((doubleval($relayTempConverted) + 273.15), 2);
             break;
-            
     }
     require_once('weather_monitor.php');
     
@@ -136,7 +141,16 @@ else if($controllerChoice == 'add_animal'){
     }
     
 }
-
+else if($controllerChoice == "list_animals"){
+    $animalTypes = monitor_db::get_animal_types();
+    
+    require_once('./animal_type_list.php');
+}
+else if($controllerChoice == "list_weather_monitors"){
+    $weatherRelays = monitor_db::get_weather_relays();
+    
+    require_once('./weather_list.php');
+}
 
     
 

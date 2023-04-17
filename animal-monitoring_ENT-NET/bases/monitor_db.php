@@ -3,8 +3,8 @@ class monitor_db {
     function __construct(){}
         static function get_monitor_by_id($ID){
             $db = database::getDB();
-                $query = "SELECT * FROM monitor RIGHT JOIN monitorHistory on monitor.id = monitorHistory.monitorID WHERE monitor.id = :ID ORDER BY monitorHistory.dateTimeChecked, userID";
-            $statement = $db->prepare($query);
+                $query = "SELECT * FROM monitor RIGHT JOIN monitorHistory on monitor.id = monitorHistory.monitorID WHERE dateTimeChecked = (SELECT MAX(dateTimeChecked) FROM monitorHistory) AND monitor.id = :ID ORDER BY userID, monitorHistory.dateTimeChecked";
+            $statement = $db->prepare($query);    
             $statement->bindValue(':ID', $ID);
             $statement->execute();
             $baseMonitor = $statement->fetchAll();
@@ -14,7 +14,7 @@ class monitor_db {
                 $date_time = DateTime($monitorData['dateTimeChecked']);
                 $formated_date = $date_time->format('d/m/y H:i');
                 $monitor = new Monitor(
-                    $monitorData['id'],   
+                    $monitorData['monitorID'],   
                     $monitorData['userID'], 
                     $monitorData['animalCount'], 
                     $monitorData['foodWeightFull'], 
@@ -41,7 +41,7 @@ class monitor_db {
         if (isset($loggedUserID) && $loggedUserID != null && $loggedUserID != '') 
         {
             if($loggedUserType == 1){
-                $query = "SELECT * FROM monitor RIGHT JOIN monitorHistory on monitor.id = monitorHistory.monitorID WHERE userID = :userID ORDER BY monitorHistory.dateTimeChecked, userID";
+                $query = "SELECT * FROM monitor RIGHT JOIN monitorHistory on monitor.id = monitorHistory.monitorID WHERE dateTimeChecked = (SELECT MAX(dateTimeChecked) FROM monitorHistory) AND userID = :userID ORDER BY userID, monitorHistory.dateTimeChecked";
                 $statement = $db->prepare($query);
                 $statement->bindValue(':userID', $loggedUserID);
                 $statement->execute();
@@ -50,21 +50,21 @@ class monitor_db {
             }
             else
             {
-                $query = "SELECT * FROM monitor JOIN monitorHistory on monitor.id = monitorHistory.monitorID ORDER BY monitorHistory.dateTimeChecked, userID";
+                $query = "SELECT * FROM monitor JOIN monitorHistory on monitor.id = monitorHistory.monitorID WHERE dateTimeChecked = (SELECT MAX(dateTimeChecked) FROM monitorHistory) ORDER BY  userID, monitorHistory.dateTimeChecked";
                 $statement = $db->prepare($query);
                 $statement->execute();
                 $baseMonitor = $statement->fetchAll();
                 $statement->closeCursor();
             }
                 $date_time = new DateTime();
-                $monitors;
+                $monitors = null;
             foreach ($baseMonitor as $monitorData){
                 $date_time = new DateTime($monitorData['dateTimeChecked']);
                 
                 $formated_date = $date_time->format('d/m/y H:i');
                 
                 $monitor = new Monitor(
-                    $monitorData['id'],   
+                    $monitorData['monitorID'],   
                     $monitorData['userID'], 
                     $monitorData['animalCount'], 
                     $monitorData['foodWeightFull'], 
@@ -84,6 +84,9 @@ class monitor_db {
                     $formated_date);
                     $monitors[] = $monitor;
                 }
+            }
+            if($monitors == null){
+                $monitors[] = new Monitor(0, 0, 0, 0, 0, "NO MONITOR FOUND", 0, 0, "NO MONITOR FOUND", 0, 0, "", "", "NO MONITOR FOUND", "", "", "", 0);
             }
             return $monitors;
         }
@@ -112,6 +115,14 @@ class monitor_db {
         $statement->execute();
         $statement->closeCursor();
     }
+    static function remove_monitor($id){
+        $db = database::getDB();  
+        $query = 'DELETE FROM monitor WHERE id = :ID';
+        $statement = $db->prepare($query);
+        $statement->bindValue(':ID', $id);
+        $statement->execute();
+        $statement->closeCursor();
+    }
     static function get_animal_types(){
         $db = database::getDB();
         
@@ -135,9 +146,9 @@ class monitor_db {
     
     $user = User_db::get_user_by_id($userID);
     
-    $query = "SELECT weatherHistory.relayID, weatherHistory.degrees, weatherHistory.expectedAlert, timeDateChecked FROM weatherHistory INNER JOIN weatherRelay ON weatherHistory.relayID = weatherRelay.id WHERE weatherRelay.city = :city AND weatherRelay.state = :state AND weatherRelay.zip = :zip ORDER BY weatherHistory.timeDateChecked DESC LIMIT 1;";
+    $query = "SELECT weatherHistory.relayID, weatherHistory.degrees, weatherHistory.expectedAlert, timeDateChecked FROM weatherHistory INNER JOIN weatherRelay ON weatherHistory.relayID = weatherRelay.id WHERE timeDateChecked = (SELECT MAX(timeDateChecked) FROM weatherHistory) AND weatherRelay.city = :city AND weatherRelay.state = :state AND weatherRelay.zip = :zip ORDER BY weatherHistory.id AND weatherHistory.timeDateChecked DESC LIMIT 1;";
     $statement = $db->prepare($query);
-            $statement->bindValue(':city', $user->getCity());
+            $statement->bindValue(':city', $user->getCity()); 
             $statement->bindValue(':state', $user->getState());
             $statement->bindValue(':zip', $user->getZip());
             $statement->execute();
@@ -158,30 +169,43 @@ class monitor_db {
     $statement->execute();
     $statement->closeCursor();
 }
-static function archive_monitors(){
-    $db = database::getDB();
-    
-    $query = "INSERT INTO monitorHistory(monitorID, foodLevel, waterLevel, dateTimeChecked) SELECT id, foodLevelAlert, waterLevelAlert, NOW() FROM monitor;";
-    $statement = $db->prepare($query);
-    $statement->execute();
-    $statement->closeCursor();
-}
-static function add_animalType($animalType){
-    $db = database::getDB();
-    
-    $query = 'INSERT INTO animalType
-                     (description, recommendedFood)
-                  VALUES
-                     (:description, :recommendedFood)';
-        $statement = $db->prepare($query);
+    static function archive_monitors(){
+        $db = database::getDB();
 
-        $statement->bindValue(':description', $animalType->getDescription());
-        $statement->bindValue(':recommendedFood', $animalType->getRecommendedFood());
-
+        $query = "INSERT INTO monitorHistory(monitorID, foodLevel, waterLevel, dateTimeChecked) SELECT id, null, null, NOW() FROM monitor;";
+        $statement = $db->prepare($query); //when dish changes are being monitored, 
         $statement->execute();
         $statement->closeCursor();
-    
-}
-    
+    }
+    static function add_animalType($animalType){
+        $db = database::getDB();
+
+        $query = 'INSERT INTO animalType
+                         (description, recommendedFood)
+                      VALUES
+                         (:description, :recommendedFood)';
+            $statement = $db->prepare($query);
+
+            $statement->bindValue(':description', $animalType->getDescription());
+            $statement->bindValue(':recommendedFood', $animalType->getRecommendedFood());
+
+            $statement->execute();
+            $statement->closeCursor();
+
+    }
+    static function get_weather_relays(){
+        $db = database::getDB();
+
+        $query = "SELECT city, state, zip, weatherHistory.relayID, weatherHistory.degrees, weatherHistory.expectedAlert, timeDateChecked FROM weatherHistory INNER JOIN weatherRelay ON weatherHistory.relayID = weatherRelay.id WHERE timeDateChecked = (SELECT MAX(timeDateChecked) FROM weatherHistory) ORDER BY weatherHistory.id AND weatherHistory.timeDateChecked DESC;";
+        $statement = $db->prepare($query);
+                $statement->execute();
+                $weatherSet = $statement->fetchAll();
+                $statement->closeCursor();
+                //$weatherRelays = new WeatherType(0, 0, "error", "No Data Found", "", "", "");
+        foreach ($weatherSet as $weather){
+            $weatherRelays[] = new WeatherType($weather['relayID'], $weather['degrees'], $weather['expectedAlert'], $weather['timeDateChecked'], $weather['city'], $weather['state'], $weather['zip']);
+        }
+        return $weatherRelays;
+    }
 }?>
 

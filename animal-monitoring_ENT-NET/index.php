@@ -6,7 +6,7 @@
     check_or_start_session();
     require('bases/User.php');
     $title = "Home Index"; 
-    require_once "view/header.php";  ?>
+    require_once ("view/header.php");  ?>
     <head>
         <meta charset="UTF-8">
             <link rel="stylesheet" type="text/css" href="styles/main.css">
@@ -15,16 +15,20 @@
     <body>
         <h1><i>Welcome to Lionel Klein's Animal Monitor!</i></h1><br>
         <?php if(!isset($_SESSION['user_ID'])): ?>
-        <a href="user_manager?controllerRequest=login_user"> Login </a><br>
-        <a href="user_manager?controllerRequest=add_user"> Register </a><br>
+        <a href="/animal-monitoring_ENT-NET/user_manager?controllerRequest=login_user"> Login </a><br>
+        <a href="/animal-monitoring_ENT-NET/user_manager?controllerRequest=add_user"> Register </a><br>
         <?php endif;?>
         
         <?php if(isset($_SESSION['user_ID'])): ?>
-        <a href="monitor_manager?controllerRequest=list_monitors"> Monitors </a><br>
-        <a href="monitor_manager?controllerRequest=new_monitor"> Add Monitor </a><br>
-        <a href="monitor_manager?controllerRequest=weather_monitor"> Weather Monitor </a><br>
+        <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=list_monitors"> Monitors </a><br>
+        <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=new_monitor"> Add Monitor </a><br>
+        <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=weather_monitor"> Weather Monitor </a><br>
             <?php if(isset($_SESSION['userType'])): ?>
-            <br><br><a href="monitor_manager?controllerRequest=new_animal"> Add Animal Type </a><br>
+                <?php if($_SESSION['userType'] != 1): ?>
+                    <br><a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=new_animal"> Add Animal Type </a><br>
+                    <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=list_animals"> Animal Type List </a><br>
+                    <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=list_weather_monitors"> Weather Monitor List </a><br>
+                <?php endif;?>
             <?php endif;?>
         <?php endif;?>
         <br><br>

@@ -6,7 +6,7 @@ check_or_start_session();
 require_once('../bases/database.php');
 require('../bases/User.php');
 require_once('../bases/user_db.php');
-require_once "../view/header.php";
+require_once ("../view/header.php");
 
 
 $controllerChoice = filter_input(INPUT_POST, 'controllerRequest');

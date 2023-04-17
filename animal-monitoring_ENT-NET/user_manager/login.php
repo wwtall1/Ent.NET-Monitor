@@ -21,5 +21,51 @@
         </div>
     </form>    
         <br><br>
+        <table>
+            <tr>
+                <th>
+                    Email:
+                </th>
+                <th>
+                    Pass:
+                </th>
+                <th>
+                    Type:
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    17083585@northwoodtech.edu
+                </td>
+                <td>
+                    testPass25
+                </td>
+                <td>
+                    User
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    17083585@northwoodtech.edu
+                </td>
+                <td>
+                    testPass23
+                </td>
+                <td>
+                    Admin
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    17083585@northwoodtech.edu
+                </td>
+                <td>
+                    noRealPass
+                </td>
+                <td>
+                    User
+                </td>
+            </tr>
+        </table>
     </body>
 
