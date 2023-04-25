@@ -20,13 +20,15 @@
         <?php endif;?>
         
         <?php if(isset($_SESSION['user_ID'])): ?>
+        <a href="/animal-monitoring_ENT-NET/user_manager?controllerRequest=edit_user"> Edit Profile </a><br><br>
         <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=list_monitors"> Monitors </a><br>
-        <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=new_monitor"> Add Monitor </a><br>
+        <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=new_monitor"> Add Monitor </a><br><br>
         <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=weather_monitor"> Weather Monitor </a><br>
             <?php if(isset($_SESSION['userType'])): ?>
                 <?php if($_SESSION['userType'] != 1): ?>
-                    <br><a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=new_animal"> Add Animal Type </a><br>
-                    <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=list_animals"> Animal Type List </a><br>
+                    <br><a href="/animal-monitoring_ENT-NET/user_manager?controllerRequest=list_users"> List Users </a><br><br>
+                    <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=new_animal"> Add Animal Type </a><br>
+                    <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=list_animals"> Animal Type List </a><br><br>
                     <a href="/animal-monitoring_ENT-NET/monitor_manager?controllerRequest=list_weather_monitors"> Weather Monitor List </a><br>
                 <?php endif;?>
             <?php endif;?>

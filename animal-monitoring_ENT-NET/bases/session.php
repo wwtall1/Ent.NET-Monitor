@@ -11,7 +11,7 @@ function end_session(){
     session_destroy(); 
     $_SESSION = array();
 }
-function user_login($ID, $firstName, $lastName, $UserTypeID = 2){
+function user_login($ID, $firstName, $lastName, $UserTypeID){
     $_SESSION['user_ID'] = $ID; 
     $_SESSION['firstName'] = $firstName; 
     $_SESSION['lastName'] = $lastName;

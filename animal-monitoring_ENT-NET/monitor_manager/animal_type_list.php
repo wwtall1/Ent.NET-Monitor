@@ -1,3 +1,4 @@
+<form action="monitor_manager/index.php" method="post">
 <table>
     <tr>
         <th>Description:</th>
@@ -8,7 +9,10 @@
     <tr>
         <td><?php echo $animalType->getDescription(); ?></td>
         <td><?php echo $animalType->getRecommendedFood(); ?></td>
-        <td><p> Edit/Delete AnimalType </p></td>
+        <td><input type='hidden' name='controllerRequest' value='delete_animal'>
+            <input type='hidden' name='typeID' id="typeID" value='<?php echo $animalType->getId(); ?>'>
+            <input type="submit" value="Delete"></td>
     </tr>
 <?php endforeach; ?>
 </table>
+</form>

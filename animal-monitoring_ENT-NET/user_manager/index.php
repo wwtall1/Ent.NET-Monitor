@@ -99,8 +99,7 @@ else if ($controllerChoice == 'validate_add_user'){
     $password = filter_input(INPUT_POST, 'password');
 
     if(!User_db::search_user_list_email($email)){
-        $title = "A New User!";
-    // Add the product to the database  
+        $title = "A New User!"; 
         $user = new User(0, 1, $firstName, $lastName, $phone, $email, $address, $city, $state, $zip,$password, 1,);
     User_db::add_user($user);
     user_login($user->getId(), $user->getFirstName(), $user->getLastName(), $user->getUserTypeID());
@@ -111,6 +110,59 @@ else if ($controllerChoice == 'validate_add_user'){
     require_once("register.php");
     }   
 }
+else if($controllerChoice == 'list_users'){
+    $title = "User List (Admins Only!)";
+    $users = User_db::list_users();
+    
+    require_once('user_list.php');
+}
+else if($controllerChoice == 'edit_user'){
+    $errorMessage = "";
+    $title = "Updating a Customer...";
+    
+    $userID = filter_input(INPUT_POST, 'userID');
+    if(!isset($userID) || $userID == null || $userID == 0){
+        $userID = $_SESSION['user_ID'];
+    }
+    $user = User_db::get_user_by_id($userID);
+    
+    require_once("register.php");
+}
+else if ($controllerChoice == 'validate_edit_user'){    
+    $firstName = filter_input(INPUT_POST, 'firstName');
+    $lastName = filter_input(INPUT_POST, 'lastName');
+    $phone = filter_input(INPUT_POST, 'phone');
+    $email = filter_input(INPUT_POST, 'email');
+    $address = filter_input(INPUT_POST, 'address');
+    $city = filter_input(INPUT_POST, 'city');
+    $state = trim(filter_input(INPUT_POST, 'state'));
+    $zip = filter_input(INPUT_POST, 'zip');
+    $isActive = filter_input(INPUT_POST, 'active', FILTER_VALIDATE_BOOLEAN);
+    $oldPassword = filter_input(INPUT_POST, 'oldPassword');
+    $newPassword = filter_input(INPUT_POST, 'newPassword');
+    $confirmPassword = filter_input(INPUT_POST, 'confirmPassword');
+    $userID = filter_input(INPUT_POST, 'userID');
+    
+    $oldUser = User_db::get_user_by_id($userID);
+    
+    if($oldUser->getPassword() == $oldPassword && $newPassword == $confirmPassword){
+        $newUser = new User($userID, 1, $firstName, $lastName, $phone, $email, $address, $city, $state, $zip, $newPassword, $isActive);
+        User_db::update_user($newUser);
+        header("Location: ../index.php");
+    }else{
+        $errorMessage = "Please Ensure all data is Valid!";
+        $title = "Updating a Customer...";
+
+        $userID = filter_input(INPUT_POST, 'userID');
+        if(!isset($userID) || $userID == null || $userID == 0){
+            $userID = $_SESSION['user_ID'];
+        }
+        $user = User_db::get_user_by_id($userID);
+
+        require_once("register.php");
+        }   
+}
+
 else if($controllerChoice == 'logout_user'){
     end_session();
     

@@ -4,7 +4,7 @@
     <input type="hidden" readonly name="controllerRequest" value="swap_monitor">
     <select name="setMonitor" id="setMonitor">
         <?php foreach ($monitors as $gottenMonitor) : ?>
-                <option value="<?php  echo$gottenMonitor->getID(); ?>"> <?php echo$gottenMonitor->getID(); echo ": "; 
+                <option value="<?php  echo$gottenMonitor->getID();  ?>"> <?php echo$gottenMonitor->getID(); echo ": "; 
                 if($gottenMonitor->getNotes() == null){echo"";}else{echo$gottenMonitor->getNotes();}?> </option> 
         <?php endforeach; ?>
     </select>

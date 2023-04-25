@@ -11,6 +11,8 @@ require_once('../bases/user_db.php');
 require_once "../view/header.php";
 
 
+
+
 $controllerChoice = filter_input(INPUT_POST, 'controllerRequest');
 if ( $controllerChoice == NULL) {
      $controllerChoice = filter_input(INPUT_GET, 'controllerRequest');
@@ -28,10 +30,28 @@ if($controllerChoice == 'list_monitors'){
 }
 else if($controllerChoice =='swap_monitor'){
     $title = "Monitor List Page";
-    monitor_db::archive_monitors();
+    
     $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
     $setMonitor = $monitors[0];
     $ifMonitor = filter_input(INPUT_POST, 'setMonitor');
+    $showMonitors = true;
+    foreach($monitors as $checkMonitor){
+        if($checkMonitor->getId() == $ifMonitor){
+            $setMonitor = $checkMonitor;
+        }
+    }
+    require_once("monitor_list.php");
+}
+else if($controllerChoice =='fill_monitor'){
+    $title = "Monitor List Page";
+    
+    
+    $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
+    $setMonitor = $monitors[0];
+    $ifMonitor = filter_input(INPUT_POST, 'setMonitor');
+    
+    monitor_db::refill_monitor($setMonitor->getId());
+    monitor_db::archive_monitors();
     $showMonitors = true;
     foreach($monitors as $checkMonitor){
         if($checkMonitor->getId() == $ifMonitor){
@@ -66,8 +86,6 @@ else if($controllerChoice == 'add_monitor'){
     $location = filter_input(INPUT_POST, 'location');
     $notes  = filter_input(INPUT_POST, 'notes');
     $feedType  = filter_input(INPUT_POST, 'feedType');
-
-    
     $date_str = date('Y-m-d'); 
     $date_time_str = trim($date_str . ' ' . $feedingTime . ''); 
     $date_time = DateTime::createFromFormat('Y-m-d H:i', $date_time_str); 
@@ -82,6 +100,58 @@ else if($controllerChoice == 'add_monitor'){
         $date_time_formatted = $date_time->format('Y-m-d H:i');
         $monitor = new Monitor(1, $userID, $animalCount, $foodWeightFull, $foodWeightEmpty, $foodAlert, $waterWeightFull, $waterWeightEmpty, $waterAlert, $date_time_formatted, 24, $animalType, $location, $notes, $feedType, 50, 50, $date_time_formatted);
         monitor_db::add_monitor($monitor);
+        header('Location: ../index.php');
+    }
+}
+else if($controllerChoice == 'edit_monitor'){
+    $monitorID = filter_input(INPUT_POST, 'monitorID');
+    $setMonitor = monitor_db::get_monitor_by_id($monitorID);
+    $dateTime = new DateTime($setMonitor->getFeedingTime());
+    $formattedTime = $dateTime->format('H:i');
+    $title = "Edit Monitor!";
+    
+    $critters = monitor_db::get_animal_types();
+    require_once("add_monitor.php"); 
+    
+    
+}
+else if($controllerChoice == 'confirm_edit_monitor'){
+    $validMonitor = true;
+    
+    if(filter_input(INPUT_POST, 'userId') != null){
+    $userID = filter_input(INPUT_POST, 'userId');
+    }
+    else{$validMonitor = false;}
+    $monitorID = filter_input(INPUT_POST, 'monitorID');
+    if(!isset($monitorID)){
+        $monitorID = 0;
+    }
+    $foodWeightFull = filter_input(INPUT_POST, 'foodFull');
+    $foodWeightEmpty = filter_input(INPUT_POST, 'foodEmpty');
+    $foodAlert = filter_input(INPUT_POST, 'foodAlert');
+    $waterWeightFull = filter_input(INPUT_POST, 'waterFull');
+    $waterWeightEmpty = filter_input(INPUT_POST, 'waterEmpty');
+    $waterAlert = filter_input(INPUT_POST, 'waterAlert');
+    $animalCount = filter_input(INPUT_POST, 'animalCount');
+    $feedingTime = htmlspecialchars(filter_input(INPUT_POST, 'feedingTime'));
+    $animalType = filter_input(INPUT_POST, 'animalType');
+    $location = filter_input(INPUT_POST, 'location');
+    $notes  = filter_input(INPUT_POST, 'notes');
+    $feedType  = filter_input(INPUT_POST, 'feedType');
+    $date_str = date('Y-m-d'); 
+    $date_time_str = trim($date_str . ' ' . $feedingTime . ''); 
+    $date_time = DateTime::createFromFormat('Y-m-d H:i', $date_time_str); 
+    $errors = DateTime::getLastErrors();
+    
+    
+    if ($errors['warning_count'] + $errors['error_count'] > 0) {
+        $title = "Add a Monitor! (with a valid Time!!)";
+        $critters = monitor_db::get_animal_types();
+        require_once("add_monitor.php"); 
+    } else {
+        $date_time_formatted = $date_time->format('Y-m-d H:i');
+        $monitor = new Monitor($monitorID, $userID, $animalCount, $foodWeightFull, $foodWeightEmpty, $foodAlert, $waterWeightFull, $waterWeightEmpty, $waterAlert, $date_time_formatted, 24, $animalType, $location, $notes, $feedType, 50, 50, $date_time_formatted);
+        monitor_db::update_monitor($monitor);
         header('Location: ../index.php');
     }
 }
@@ -124,7 +194,7 @@ else if($controllerChoice == 'weather_monitor' || $controllerChoice == 'change_w
 else if($controllerChoice == 'new_animal'){
     $title = "Add an Animal Type!";
     
-    require_once ('./add_animal.php');
+    require_once ('add_animal.php');
     
 }
 else if($controllerChoice == 'add_animal'){
@@ -137,19 +207,27 @@ else if($controllerChoice == 'add_animal'){
     }
     else{
         $title = "Add a Valid Animal Type!!";
-        require_once ('./add_animal.php');
+        require_once ('add_animal.php');
     }
     
 }
 else if($controllerChoice == "list_animals"){
     $animalTypes = monitor_db::get_animal_types();
     
-    require_once('./animal_type_list.php');
+    require_once('animal_type_list.php');
+}
+else if($controllerChoice == "delete_animal"){
+    $removeID = filter_input(INPUT_POST, 'typeID');
+    monitor_db::remove_animalType($removeID);
+    
+    $animalTypes = monitor_db::get_animal_types();
+    
+    require_once('animal_type_list.php');
 }
 else if($controllerChoice == "list_weather_monitors"){
     $weatherRelays = monitor_db::get_weather_relays();
     
-    require_once('./weather_list.php');
+    require_once('weather_list.php');
 }
 
     
