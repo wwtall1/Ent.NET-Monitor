@@ -7,9 +7,7 @@
         }else if(str_contains($title, "Edit")){
             echo"<input type='hidden' readonly name='controllerRequest' value='confirm_edit_monitor'>";
     } ?>
-
-<!--add admin-only option for ID, so an Admin can choose what User gets the Monitor. Maybe a text input; get max ID, 
-possible list/SELECT to find what User has what ID? Maybe have the SELECT auto-fill the ID? -->
+<!-- Admins should not need to make Monitors for Users. -->
 <fieldset id="metaField">
     <label for='userId'>User ID: </label>
     <input type='text' name='userId' id='userId' value='<?php echo $_SESSION['user_ID']; if($_SESSION['userType'] == 1){echo 'hidden';} ?> '>

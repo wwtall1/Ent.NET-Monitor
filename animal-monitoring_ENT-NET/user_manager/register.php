@@ -3,7 +3,7 @@
            <?php if(!isset($_SESSION['user_ID'])){echo("<input type='hidden' name='controllerRequest' value='validate_add_user'>");} 
            else if(isset($_SESSION['user_ID'])){echo("<input type='hidden' name='controllerRequest' value='validate_edit_user'>");
            echo("<label for='userID'> User ID: </label>");
-           echo("<input type='text' name='userID' value='".$user->getId()."' disabled> <br>");
+           echo("<input type='text' name='userID' id='userID' value='".$user->getId()."' readonly> <br>");
            }?>
         <div id="data">
             <p><?php echo $errorMessage; ?></p>
@@ -25,12 +25,16 @@
             <input type="text" name="zip" value="<?php echo ($user->getZip()); ?>"> <br>
             <label>Active:</label>
             <input type="checkbox" name="active" <?php if($user->getIsActive()){echo 'checked';} ?>> <br>
-            <label>Old Password:</label>
-            <input type="text" name="oldPassword"> <br>
+            <?php if(!isset($_SESSION['user_ID'])){echo("<label>Password:</label>
+            <input type='text' name='password'> <br>");} 
+           else if(isset($_SESSION['user_ID'])){echo("<label>Old Password:</label>
+            <input type='text' name='oldPassword'> <br>
             <label>New Password:</label>
-            <input type="text" name="newPassword"> <br>
+            <input type='text' name='newPassword'> <br>
             <label>Confirm Password:</label>
-            <input type="text" name="confirmPassword""> <br>
+            <input type='text' name='confirmPassword'> <br>");
+           }?>
+
         <div id="buttons">
             <label>&nbsp;</label>
             <input type="submit" value="Submit"><br></div>

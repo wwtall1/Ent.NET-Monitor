@@ -1,6 +1,6 @@
 <form action="monitor_manager/index.php" method="post">
 <input type="hidden" readonly name="controllerRequest" value="add_animal">
-
+<!-- ADMIN ONLY -->
 
 <fieldset>
     <legend>Add Animal Type</legend>

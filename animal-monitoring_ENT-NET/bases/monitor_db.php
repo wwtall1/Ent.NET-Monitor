@@ -3,7 +3,18 @@ class monitor_db {
     function __construct(){}
         static function get_monitor_by_id($ID){
             $db = database::getDB();
-                $query = "SELECT * FROM monitor RIGHT JOIN monitorHistory on monitor.id = monitorHistory.monitorID WHERE dateTimeChecked = (SELECT MAX(dateTimeChecked) FROM monitorHistory) AND monitor.id = :ID ORDER BY userID, monitorHistory.dateTimeChecked";
+                $query = "SELECT m.*, mh.*
+                            FROM monitor m
+                            RIGHT JOIN (
+                              SELECT monitorID, MAX(id) AS max_id
+                              FROM monitorHistory
+                              GROUP BY monitorID
+                            ) mh_max
+                            ON m.id = mh_max.monitorID
+                            INNER JOIN monitorHistory mh
+                            ON mh.id = mh_max.max_id AND m.id = mh.monitorID
+                            WHERE m.id = :ID
+                            ORDER BY m.userID, mh.dateTimeChecked";
             $statement = $db->prepare($query);    
             $statement->bindValue(':ID', $ID);
             $statement->execute();
@@ -41,9 +52,18 @@ class monitor_db {
         if (isset($loggedUserID) && $loggedUserID != null && $loggedUserID != '') 
         {
             if($loggedUserType == 1){
-                $query = "SELECT * FROM monitor JOIN monitorHistory ON monitor.id = monitorHistory.monitorID WHERE userID = :userID AND 
-                            (monitorHistory.monitorID, monitorHistory.dateTimeChecked) IN (SELECT monitorID, MAX(dateTimeChecked)FROM monitorHistory
-                                GROUP BY monitorID) ORDER BY userID, monitorHistory.dateTimeChecked;";
+                $query = "SELECT m.*, mh.*
+                            FROM monitor m
+                            RIGHT JOIN (
+                              SELECT monitorID, MAX(id) AS max_id
+                              FROM monitorHistory
+                              GROUP BY monitorID
+                            ) mh_max
+                            ON m.id = mh_max.monitorID
+                            INNER JOIN monitorHistory mh
+                            ON mh.id = mh_max.max_id AND m.id = mh.monitorID
+                            WHERE m.id = :ID
+                            ORDER BY m.userID, mh.dateTimeChecked";
                 $statement = $db->prepare($query);
                 $statement->bindValue(':userID', $loggedUserID);
                 $statement->execute();
@@ -52,13 +72,17 @@ class monitor_db {
             }
             else
             {
-                $query = "SELECT * FROM monitor JOIN monitorHistory ON monitor.id = monitorHistory.monitorID
-                            WHERE (monitorHistory.monitorID, monitorHistory.dateTimeChecked) IN (
-                                SELECT monitorID, MAX(dateTimeChecked)
-                                FROM monitorHistory
-                                GROUP BY monitorID
-                            )
-                            ORDER BY userID, monitorHistory.dateTimeChecked;";
+                $query = "SELECT m.*, mh.*
+                            FROM monitor m
+                            RIGHT JOIN (
+                              SELECT monitorID, MAX(id) AS max_id
+                              FROM monitorHistory
+                              GROUP BY monitorID
+                            ) mh_max
+                            ON m.id = mh_max.monitorID
+                            INNER JOIN monitorHistory mh
+                            ON mh.id = mh_max.max_id AND m.id = mh.monitorID
+                            ORDER BY m.userID, mh.dateTimeChecked";
                 $statement = $db->prepare($query);
                 $statement->execute();
                 $baseMonitor = $statement->fetchAll();
@@ -176,7 +200,7 @@ class monitor_db {
     static function get_weather($userID){
     $db = database::getDB();
     $user = User_db::get_user_by_id($userID);
-    $query = "SELECT weatherHistory.relayID, weatherHistory.degrees, weatherHistory.expectedAlert, timeDateChecked FROM weatherHistory INNER JOIN weatherRelay ON weatherHistory.relayID = weatherRelay.id WHERE timeDateChecked = (SELECT MAX(timeDateChecked) FROM weatherHistory) AND weatherRelay.city = :city AND weatherRelay.state = :state AND weatherRelay.zip = :zip ORDER BY weatherHistory.id AND weatherHistory.timeDateChecked DESC LIMIT 1;";
+    $query = "SELECT weatherHistory.relayID, weatherHistory.degrees, weatherHistory.expectedAlert, timeDateChecked FROM weatherHistory INNER JOIN weatherRelay ON weatherHistory.relayID = weatherRelay.id WHERE timeDateChecked = (SELECT MAX(timeDateChecked) FROM weatherHistory) AND weatherRelay.city = :city AND weatherRelay.state = :state AND weatherRelay.zip = :zip ORDER BY weatherHistory.timeDateChecked DESC LIMIT 1;";
     $statement = $db->prepare($query);
             $statement->bindValue(':city', $user->getCity()); 
             $statement->bindValue(':state', $user->getState());
@@ -190,6 +214,59 @@ class monitor_db {
     }
     return $weatherRelay;       
 }
+    static function getWeatherDataToDB($userID){
+        $user = User_db::get_user_by_id($userID);
+        $weatherData = self::getWeatherData($user->getCity(), $user->getState(), $user->getZip());
+
+        $db = database::getDB();  
+            $query ='INSERT INTO weatherRelay (degrees, expectedAlert, city, state, zip)
+                        VALUES (:degrees, :alert, :city, :state, :zip)
+                            ON DUPLICATE KEY UPDATE degrees = :degrees, expectedAlert = :alert';
+
+        $statement = $db->prepare($query);
+            $statement->bindValue(':degrees', $weatherData['temperature']);
+            $statement->bindValue(':alert', $weatherData['alerts']);
+            $statement->bindValue(':city', $user->getCity());
+            $statement->bindValue(':state', $user->getState());
+            $statement->bindValue(':zip', $user->getZip());
+
+            $statement->execute();
+            $statement->closeCursor();
+            return $weatherData;
+    }
+    static function getWeatherData($city, $state, $zip) {
+            $api_key = "5ffaeef239605a4ec121bdedd765f6cd";
+            $url = "https://api.openweathermap.org/data/2.5/weather?q={$city},{$state},{$zip},US&appid={$api_key}&units=imperial";
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $response = curl_exec($ch);
+            curl_close($ch);
+
+            if (!$response) {
+                return false;
+            }
+
+            $data = json_decode($response, true);
+            
+            $alerts = array();
+            if (isset($data['alerts'])) {
+                foreach ($data['alerts'] as $alert) {
+                    $alerts[] = $alert['event'];
+                }
+            }
+
+
+            //are arrays a good way to do this?
+            $weather_data = array(
+                'temperature' => $data['main']['temp'],
+                //'alerts' => $alerts,
+                'alerts' => $data['weather'][0]['description'],
+            );
+
+            return $weather_data;
+    }
+
     static function archive_weather(){
     $db = database::getDB();
     
@@ -201,6 +278,20 @@ class monitor_db {
     static function archive_monitors(){
         
                 $db = database::getDB();
+                
+                $queryCheck = "SELECT COUNT(*) FROM monitorHistory";
+                $statement1 = $db->query($queryCheck);
+                $count = $statement1->fetchColumn();
+                $statement1->closeCursor();
+
+                if ($count == 0) {
+                    // if monitorHistory table is empty, insert sort-unfriendly datafrom the monitor table
+                    $queryInsert = "INSERT INTO monitorHistory (monitorID, foodLevel, waterLevel, dateTimeChecked)
+                                    SELECT id, foodWeightFull, waterWeightFull, NOW() FROM monitor";
+                    $statement2 = $db->prepare($queryInsert);
+                    $statement2->execute();
+                    $statement2->closeCursor();
+                }
 
                 $queryGet = "SELECT * FROM monitor JOIN monitorHistory ON monitor.id = monitorHistory.monitorID
                             WHERE (monitorHistory.monitorID, monitorHistory.dateTimeChecked) IN (
@@ -209,10 +300,10 @@ class monitor_db {
                                 GROUP BY monitorID
                             )
                             ORDER BY userID, monitorHistory.dateTimeChecked;";
-                $statement1 = $db->prepare($queryGet);
-                $statement1->execute();
-                $baseMonitors = $statement1->fetchAll();
-                $statement1->closeCursor();
+                $statement3 = $db->prepare($queryGet);
+                $statement3->execute();
+                $baseMonitors = $statement3->fetchAll();
+                $statement3->closeCursor();
             foreach ($baseMonitors as $monitorData){
                 
                 if($monitorData['foodLevel'] != null){
@@ -234,17 +325,24 @@ class monitor_db {
                     $waterSet = $monitorData['waterWeightFull'];
                 }
                 
-                $querySet = 'INSERT monitorHistory(monitorID, foodLevel, waterLevel, dateTimeChecked) 
-                        VALUES
-                            (:monitorID, :foodLevel, :waterLevel, NOW());';
-                
-                $statement2 = $db->prepare($querySet); 
-                $statement2->bindValue(':monitorID', $monitorData['monitorID']);
-                $statement2->bindValue(':foodLevel', $foodSet);
-                $statement2->bindValue(':waterLevel', $waterSet);
-                
-                $statement2->execute();
-                $statement2->closeCursor();
+                if ($monitorData['monitorID'] === null) {
+                    $querySet = 'INSERT INTO monitorHistory (monitorID, foodLevel, waterLevel, dateTimeChecked)
+                                    SELECT m.id, m.foodWeightFull, m.waterWeightFull, NOW()
+                                    FROM monitor m
+                                    LEFT JOIN monitorHistory mh ON m.id = mh.monitorID
+                                    WHERE mh.monitorID IS NULL AND m.id = :monitorID';
+                } else {
+                    $querySet = 'INSERT INTO monitorHistory (monitorID, foodLevel, waterLevel, dateTimeChecked)
+                                VALUES (:monitorID, :foodLevel, :waterLevel, NOW())';
+                }
+
+                $statement4 = $db->prepare($querySet); 
+                $statement4->bindValue(':monitorID', $monitorData['monitorID']);
+                $statement4->bindValue(':foodLevel', $foodSet);
+                $statement4->bindValue(':waterLevel', $waterSet);
+
+                $statement4->execute();
+                $statement4->closeCursor();
                 }
                     
         

@@ -30,7 +30,7 @@ if($controllerChoice == 'list_monitors'){
 }
 else if($controllerChoice =='swap_monitor'){
     $title = "Monitor List Page";
-    
+    //monitor_db::archive_monitors();
     $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
     $setMonitor = $monitors[0];
     $ifMonitor = filter_input(INPUT_POST, 'setMonitor');
@@ -104,6 +104,8 @@ else if($controllerChoice == 'add_monitor'){
     }
 }
 else if($controllerChoice == 'edit_monitor'){
+    
+    
     $monitorID = filter_input(INPUT_POST, 'monitorID');
     $setMonitor = monitor_db::get_monitor_by_id($monitorID);
     $dateTime = new DateTime($setMonitor->getFeedingTime());
@@ -168,6 +170,11 @@ else if($controllerChoice == 'remove_monitor'){
     require_once("monitor_list.php");
 }
 else if($controllerChoice == 'weather_monitor' || $controllerChoice == 'change_weather'){
+    $title = "Weather Information";
+    
+    $weatherData = monitor_db::getWeatherDataToDB($_SESSION['user_ID']);
+    
+    
     monitor_db::archive_weather();
     $relayHistory = monitor_db::get_weather($_SESSION['user_ID']);
     $setTemperatureType = filter_input(INPUT_POST, 'temperatureSelect');
@@ -176,7 +183,8 @@ else if($controllerChoice == 'weather_monitor' || $controllerChoice == 'change_w
     }
     $relayTempConverted = 0;
     
-    
+
+    // $relayHistory->getTimeDateChecked();
     switch($setTemperatureType){
         default:
         case '1':
@@ -184,10 +192,12 @@ else if($controllerChoice == 'weather_monitor' || $controllerChoice == 'change_w
             break;
         case'2':
             $relayTempConverted = round(((doubleval($relayHistory->getDegrees()) - 32 ) * (5/9)), 2);
+            break;
         case'3':
-            $relayTempConverted = round((doubleval($relayTempConverted) + 273.15), 2);
+            $relayTempConverted = round((((doubleval($relayHistory->getDegrees()) - 32 ) * (5/9)) + 273.15), 2);
             break;
     }
+    //$relayTempConverted = $weatherData['temperature'];
     require_once('weather_monitor.php');
     
 }
@@ -213,20 +223,20 @@ else if($controllerChoice == 'add_animal'){
 }
 else if($controllerChoice == "list_animals"){
     $animalTypes = monitor_db::get_animal_types();
-    
+    $title = 'Animal Types!';
     require_once('animal_type_list.php');
 }
 else if($controllerChoice == "delete_animal"){
     $removeID = filter_input(INPUT_POST, 'typeID');
     monitor_db::remove_animalType($removeID);
-    
+    $title = 'Animal Types!';
     $animalTypes = monitor_db::get_animal_types();
     
     require_once('animal_type_list.php');
 }
 else if($controllerChoice == "list_weather_monitors"){
     $weatherRelays = monitor_db::get_weather_relays();
-    
+    $title = 'User Weather Info!';
     require_once('weather_list.php');
 }
 
@@ -243,7 +253,7 @@ else {
         require_once '../view/footer.php';
       
 }
-/* require_once '../include/showGetPostVariables.php';
+/* require_once '../view/showGetPostVariables.php';
 funShowAllPOSTandGETvariables(); */
 require_once '../view/footer.php';
 

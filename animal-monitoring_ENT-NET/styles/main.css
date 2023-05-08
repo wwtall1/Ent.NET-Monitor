@@ -110,10 +110,42 @@ fieldset{
     box-sizing: border-box;
 }
 #metaField{
-    width: 70%;
+    width: 75%;
 }
-
-
+#data input[type="text"]{
+    width: 25%;
+}
+#admin-data {
+    align-self: center;
+    
+}
+#admin-data table, td, th{
+    border: 3px solid maroon;
+    border-collapse: collapse;
+    padding: .3em .5em .3em .5em;
+    margin: 2%;
+    margin-left: 10%;
+    vertical-align: top;
+    text-align: left;
+}
+#weather-any fieldset{
+    display: flow;
+}
+#temperature{
+    font-variant: small-caps;
+    font-size: 200%;
+}
+#weather-any #submit{
+    align-self: center;
+    padding: .2em;
+    margin-left: 25%;
+}
+#alert{
+     font-weight: bold;
+     font-variant: small-caps;
+     font-size: 200%;
+     margin-left: 9%;
+}
 @media only screen and (max-width: 479px) {
     header h1{
         text-align: center;

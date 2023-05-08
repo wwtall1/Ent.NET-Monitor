@@ -30,6 +30,7 @@ if($controllerChoice == 'login_user'){
     require_once("login.php");
 }
 else if($controllerChoice == 'validate_login'){
+    $title = "Logging In.. maybe?";
     $email = filter_input(INPUT_POST, 'email');
     $password = filter_input(INPUT_POST, 'password');
     if ($email == null || $email == ''|| $password == null || $password == '') {
@@ -71,7 +72,7 @@ else if($controllerChoice == 'validate_login'){
             include('login.php');
         }
     }
-    $title = "Logging In.. maybe?";
+    
 }
 else if ($controllerChoice == 'add_user'){
     $errorMessage = "";
@@ -85,6 +86,7 @@ else if ($controllerChoice == 'add_user'){
     if (!isset($state)) { $state = 'WI'; }
     if (!isset($zip)) { $zip = '12345'; }
     if (!isset($password)) { $password = '147258'; }
+    $user = new User(0, 0, $firstName, $lastName, $phone, $email, $address, $city, $state, $zip, $password, 0);
     require_once("register.php");
 }
 else if ($controllerChoice == 'validate_add_user'){    

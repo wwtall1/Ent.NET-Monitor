@@ -1,4 +1,5 @@
 <form action="monitor_manager/index.php" method="post">
+    <!-- ADMIN ONLY -->
 <table>
     <tr>
         <th>Description:</th>
@@ -14,5 +15,5 @@
             <input type="submit" value="Delete"></td>
     </tr>
 <?php endforeach; ?>
-</table>
-</form>
+</table><br><br>
+</form><br><br><br>
