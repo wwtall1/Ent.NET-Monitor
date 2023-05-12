@@ -30,7 +30,7 @@ if($controllerChoice == 'list_monitors'){
 }
 else if($controllerChoice =='swap_monitor'){
     $title = "Monitor List Page";
-    //monitor_db::archive_monitors();
+    monitor_db::archive_monitors();
     $monitors = monitor_db::get_monitors($_SESSION['user_ID'], $_SESSION['userType']);
     $setMonitor = $monitors[0];
     $ifMonitor = filter_input(INPUT_POST, 'setMonitor');
@@ -100,6 +100,7 @@ else if($controllerChoice == 'add_monitor'){
         $date_time_formatted = $date_time->format('Y-m-d H:i');
         $monitor = new Monitor(1, $userID, $animalCount, $foodWeightFull, $foodWeightEmpty, $foodAlert, $waterWeightFull, $waterWeightEmpty, $waterAlert, $date_time_formatted, 24, $animalType, $location, $notes, $feedType, 50, 50, $date_time_formatted);
         monitor_db::add_monitor($monitor);
+        echo $monitor->getAnimalCount(); echo $monitor->getAnimalType(); echo $monitor->getFeedType();echo $monitor->getId();
         header('Location: ../index.php');
     }
 }

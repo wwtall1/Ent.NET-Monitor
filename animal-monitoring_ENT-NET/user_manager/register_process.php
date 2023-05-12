@@ -1,6 +1,6 @@
 <body>
         <div>
-            <p>Registration Successful!</p>
+            <p>Registration Successful! Please Log In!</p>
         </div>
     </form>    
         <br><br>

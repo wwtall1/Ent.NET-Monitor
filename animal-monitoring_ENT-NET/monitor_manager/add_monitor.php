@@ -10,7 +10,7 @@
 <!-- Admins should not need to make Monitors for Users. -->
 <fieldset id="metaField">
     <label for='userId'>User ID: </label>
-    <input type='text' name='userId' id='userId' value='<?php echo $_SESSION['user_ID']; if($_SESSION['userType'] == 1){echo 'hidden';} ?> '>
+    <input type='text' name='userId' id='userId' value='<?php echo $_SESSION['user_ID']; ?> '<?php if($_SESSION['userType'] == 1){echo 'readonly';}  ?>>
     <input type="hidden" name="monitorID" id="monitorID" <?php if(isset($monitorID)){ echo('value="'.$monitorID.'"'); }else{ echo "value='0'";} ?>>
 <fieldset id='foodSide'>
     <legend>Food Dish Setup</legend>

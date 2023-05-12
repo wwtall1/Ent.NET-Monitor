@@ -7,11 +7,11 @@
         <div id="data">
             <label>E-mail:</label>
             <input type="text" name="email"
-                   value="17083585@northwoodtech.edu">
+                   value="">
             <br>
             <label>Password:</label>
             <input type="text" name="password"
-                   value="testPass23">
+                   value="">
             <br>
 <!-- <?php echo htmlspecialchars($email); ?>   <?php echo htmlspecialchars($password); ?> -->
         <div id="buttons">

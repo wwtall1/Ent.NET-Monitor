@@ -77,15 +77,15 @@ else if($controllerChoice == 'validate_login'){
 else if ($controllerChoice == 'add_user'){
     $errorMessage = "";
     $title = "Adding a Customer...";
-    if (!isset($firstName)) { $firstName = 'Lionel'; }
-    if (!isset($lastName)) { $lastName = 'Klein'; }
-    if (!isset($phone)) { $phone = '1234567890'; }
-    if (!isset($email)) { $email = 'blub@blub.com'; }
-    if (!isset($address)) { $address = 'asd Run AWay'; }
-    if (!isset($city)) { $city = 'Land'; }
-    if (!isset($state)) { $state = 'WI'; }
-    if (!isset($zip)) { $zip = '12345'; }
-    if (!isset($password)) { $password = '147258'; }
+    if (!isset($firstName)) { $firstName = ''; }
+    if (!isset($lastName)) { $lastName = ''; }
+    if (!isset($phone)) { $phone = ''; }
+    if (!isset($email)) { $email = ''; }
+    if (!isset($address)) { $address = ''; }
+    if (!isset($city)) { $city = ''; }
+    if (!isset($state)) { $state = ''; }
+    if (!isset($zip)) { $zip = ''; }
+    if (!isset($password)) { $password = ''; }
     $user = new User(0, 0, $firstName, $lastName, $phone, $email, $address, $city, $state, $zip, $password, 0);
     require_once("register.php");
 }
@@ -104,10 +104,11 @@ else if ($controllerChoice == 'validate_add_user'){
         $title = "A New User!"; 
         $user = new User(0, 1, $firstName, $lastName, $phone, $email, $address, $city, $state, $zip,$password, 1,);
     User_db::add_user($user);
-    user_login($user->getId(), $user->getFirstName(), $user->getLastName(), $user->getUserTypeID());
+    //user_login($user->getId(), $user->getFirstName(), $user->getLastName(), $user->getUserTypeID());
     require_once("register_process.php");
     }else{
-    $errorMessage = "User already exists!";
+    $errorMessage = "User already exists with this E-mail!";
+    $user = new User(0, 0, $firstName, $lastName, $phone, $email, $address, $city, $state, $zip, $password, 0);
     $title = "Adding a User...";
     require_once("register.php");
     }   

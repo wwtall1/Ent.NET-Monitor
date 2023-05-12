@@ -62,7 +62,7 @@ class monitor_db {
                             ON m.id = mh_max.monitorID
                             INNER JOIN monitorHistory mh
                             ON mh.id = mh_max.max_id AND m.id = mh.monitorID
-                            WHERE m.id = :ID
+                            WHERE m.userID = :userID
                             ORDER BY m.userID, mh.dateTimeChecked";
                 $statement = $db->prepare($query);
                 $statement->bindValue(':userID', $loggedUserID);
@@ -278,6 +278,17 @@ class monitor_db {
     static function archive_monitors(){
         
                 $db = database::getDB();
+                
+                $queryStart = 'INSERT INTO monitorHistory (monitorID, foodLevel, waterLevel, dateTimeChecked)
+                                    SELECT m.id, m.foodWeightFull, m.waterWeightFull, NOW()
+                                    FROM monitor m
+                                    LEFT JOIN monitorHistory mh ON m.id = mh.monitorID
+                                    WHERE mh.monitorID IS NULL';
+                $statement0 = $db->prepare($queryStart);
+                $statement0->execute();
+                $statement0->closeCursor();
+                
+                
                 
                 $queryCheck = "SELECT COUNT(*) FROM monitorHistory";
                 $statement1 = $db->query($queryCheck);
